@@ -9,7 +9,6 @@ class Fruit:
     def __init__(self, type, imgs, space, pos):
         self.type = type
         self.img = imgs[self.type]
-        self.img = pt.scale(self.img, tuple(n * settings.fruit_size for n in self.img.get_size()))
         self.position = pos
         self.body = pymunk.Body()
         self.body.position = self.position

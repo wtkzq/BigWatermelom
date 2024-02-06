@@ -56,7 +56,7 @@ class Game:
             self.settings.screen_width, self.settings.screen_height, self.settings.floor_height)
 
         self.fruit_imgs = ImgLoader()
-        self.fruit_imgs.load(settings.fruit_imgs, settings.img_path)
+        self.fruit_imgs.load(settings.fruit_imgs, settings.img_path, self.settings.fruit_size)
         self.fruits = []
 
         self.floor = pygame.transform.scale(
@@ -74,6 +74,9 @@ class Game:
         self.line_rect = self.line.get_rect()
         self.line_rect.x = 0
         self.line_rect.y = self.settings.top_blank_height
+        self.fruit_preview = self.fruit_imgs.imgs[0]
+        self.fruit_preview_rect = self.fruit_preview.get_rect()
+        self.fruit_preview_rect.centery = self.settings.top_blank_height / 2
 
     def main_loop(self):
         while True:
@@ -81,8 +84,13 @@ class Game:
                 if event.type == pygame.QUIT:  # 退出
                     exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    self.fruits.append(Fruit(0, self.fruit_imgs.imgs, self.space, pygame.mouse.get_pos()))
+                    self.fruits.append(
+                        Fruit(0, self.fruit_imgs.imgs, self.space,
+                              (pygame.mouse.get_pos()[0], self.settings.top_blank_height / 2)
+                              )
+                    )
 
+            self.fruit_preview_rect.centerx = pygame.mouse.get_pos()[0]
             self.draw()
             self.space.step(1 / self.settings.fps)
             self.clock.tick(self.settings.fps)
@@ -93,4 +101,5 @@ class Game:
             fruit.draw(self.screen)
         self.screen.blit(self.floor, self.floor_rect)
         self.screen.blit(self.line, self.line_rect)
+        self.screen.blit(self.fruit_preview, self.fruit_preview_rect)
         pygame.display.update()

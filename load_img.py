@@ -2,7 +2,8 @@ import pygame
 
 
 class ImgLoader:
-    def load(self, file_names: list, path):
+    def load(self, file_names: list, path, size):
         self.imgs = []
         for file in file_names:
-            self.imgs.append(pygame.image.load(path + file))
+            img = pygame.image.load(path + file)
+            self.imgs.append(pygame.transform.scale(img, tuple(n * size for n in img.get_size())))
