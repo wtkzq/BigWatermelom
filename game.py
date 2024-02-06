@@ -32,8 +32,8 @@ class GameSpace(pymunk.Space):
         shape = pymunk.Circle(body, radius)
         shape.mass = mass
         shape.color = 255, 0, 0, 100
-        shape.elasticity = 0.9
-        shape.friction = 0.4
+        shape.elasticity = elasticity
+        shape.friction = friction
         self.add(body, shape)
         return shape
 

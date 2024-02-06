@@ -1,7 +1,14 @@
+!encoding=utf-8
+# 屏幕大小
 screen_width = 400
 screen_height = 720
+
 fps = 60
+
+# 图片文件夹
 img_path = img\
+
+# 水果图片名
 fruit_imgs = \
 [
     "fruit_1.png",
@@ -17,9 +24,25 @@ fruit_imgs = \
     "fruit_11.png"
 ]
 \
+
+# 地板、判定线图片名
 floor_img = floor.png
-floor_height = 60
 line_img = line.png
+
+# 地板高度
+floor_height = 60
+
+# 判定线的宽度
 line_size = 2
+
+# 判定线与顶部的距离
 top_blank_height = 70
+
+# 水果大小（与原图片的倍数）
 fruit_size = 0.5
+
+# 水果弹性
+fruit_elasticity = 0.2
+
+# 水果摩擦
+fruit_friction = 0.4

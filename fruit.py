@@ -14,8 +14,8 @@ class Fruit:
         self.body.position = self.position
         self.shape = pymunk.Circle(self.body, self.img.get_size()[0] / 2)
         self.shape.mass = 10
-        self.shape.elasticity = 0.9
-        self.shape.friction = 0.4
+        self.shape.elasticity = settings.fruit_elasticity
+        self.shape.friction = settings.fruit_friction
         space.add(self.body, self.shape)
 
     def draw(self, screen: pygame.Surface):
