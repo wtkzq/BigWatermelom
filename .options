@@ -1,0 +1,20 @@
+screen_width = 400
+screen_height = 720
+fps = 60
+img_path = img\
+fruit_imgs = \
+[
+    "fruit_1.png",
+    "fruit_2.png",
+    "fruit_3.png",
+    "fruit_4.png",
+    "fruit_5.png",
+    "fruit_6.png",
+    "fruit_7.png",
+    "fruit_8.png",
+    "fruit_9.png",
+    "fruit_10.png",
+    "fruit_11.png"
+]
+\
+floor_img = floor.png
