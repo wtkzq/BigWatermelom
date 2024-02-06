@@ -4,7 +4,7 @@ from keyword import kwlist
 from pathlib import Path
 
 
-class Settings:
+class _Settings:
     def __init__(self):
         setting_file_name = ".options"
         with open(setting_file_name) as f:
@@ -47,4 +47,4 @@ class Settings:
                     exit(-1)
 
 
-settings = Settings()
+settings = _Settings()

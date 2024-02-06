@@ -4,6 +4,7 @@ import pymunk.pygame_util
 from sys import exit
 from load_img import ImgLoader
 from fruit import Fruit
+from random import randint
 
 
 class GameSpace(pymunk.Space):
@@ -55,6 +56,7 @@ class Game:
         self.space.create_boundaries(
             self.settings.screen_width, self.settings.screen_height, self.settings.floor_height)
 
+        # 初始化图像
         self.fruit_imgs = ImgLoader()
         self.fruit_imgs.load(settings.fruit_imgs, settings.img_path, self.settings.fruit_size)
         self.fruits = []
@@ -74,9 +76,10 @@ class Game:
         self.line_rect = self.line.get_rect()
         self.line_rect.x = 0
         self.line_rect.y = self.settings.top_blank_height
-        self.fruit_preview = self.fruit_imgs.imgs[0]
-        self.fruit_preview_rect = self.fruit_preview.get_rect()
-        self.fruit_preview_rect.centery = self.settings.top_blank_height / 2
+
+        self.id = 0
+        self.next_type = 0
+        self.set_fruit_preview()
 
     def main_loop(self):
         while True:
@@ -85,10 +88,12 @@ class Game:
                     exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     self.fruits.append(
-                        Fruit(0, self.fruit_imgs.imgs, self.space,
+                        Fruit(self.next_type, self.fruit_imgs.imgs, self.space,
                               (pygame.mouse.get_pos()[0], self.settings.top_blank_height / 2)
                               )
                     )
+                    self.next_type = self.get_next_type()
+                    self.set_fruit_preview()
 
             self.fruit_preview_rect.centerx = pygame.mouse.get_pos()[0]
             self.draw()
@@ -103,3 +108,15 @@ class Game:
         self.screen.blit(self.line, self.line_rect)
         self.screen.blit(self.fruit_preview, self.fruit_preview_rect)
         pygame.display.update()
+
+    def get_next_type(self):
+        self.id += 1
+        if self.id < 4:
+            return 0
+        else:
+            return randint(0, 3)
+
+    def set_fruit_preview(self):
+        self.fruit_preview = self.fruit_imgs.imgs[self.next_type]
+        self.fruit_preview_rect = self.fruit_preview.get_rect()
+        self.fruit_preview_rect.centery = self.settings.top_blank_height / 2
