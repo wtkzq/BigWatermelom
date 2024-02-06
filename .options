@@ -18,3 +18,7 @@ fruit_imgs = \
 ]
 \
 floor_img = floor.png
+floor_height = 60
+line_img = line.png
+line_size = 2
+top_blank_height = 50

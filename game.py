@@ -10,9 +10,9 @@ class GameSpace(pymunk.Space):
     def init(self):
         super().__init__()
 
-    def create_boundaries(self, screen_width, screen_height):
+    def create_boundaries(self, screen_width, screen_height, floor_height):
         rects = [
-            ((screen_width / 2, screen_height - 10), (screen_width, 20)),
+            ((screen_width / 2, screen_height - floor_height / 2), (screen_width, floor_height)),
             ((-10, screen_height / 2), (20, screen_height)),
             ((screen_width + 10, screen_height / 2), (20, screen_height))
         ]
@@ -52,13 +52,28 @@ class Game:
         self.space = GameSpace()
         self.space.gravity = 0, 981
         self.draw_options = pymunk.pygame_util.DrawOptions(self.screen)
-        self.space.create_boundaries(self.settings.screen_width, self.settings.screen_height)
+        self.space.create_boundaries(
+            self.settings.screen_width, self.settings.screen_height, self.settings.floor_height)
 
         self.fruit_imgs = ImgLoader()
         self.fruit_imgs.load(settings.fruit_imgs, settings.img_path)
         self.fruits = []
 
-        self.floor = pygame.image.load(self.settings.img_path + self.settings.floor_img)
+        self.floor = pygame.transform.scale(
+            pygame.image.load(self.settings.img_path + self.settings.floor_img),
+            (self.settings.screen_width, self.settings.floor_height)
+        )
+        self.floor_rect = self.floor.get_rect()
+        self.floor_rect.x = 0
+        self.floor_rect.bottom = self.screen.get_rect().bottom
+
+        self.line = pygame.transform.scale(
+            pygame.image.load(self.settings.img_path + self.settings.line_img),
+            (self.settings.screen_width, self.settings.line_size)
+        )
+        self.line_rect = self.line.get_rect()
+        self.line_rect.x = 0
+        self.line_rect.y = self.settings.top_blank_height
 
     def main_loop(self):
         while True:
@@ -76,8 +91,6 @@ class Game:
         self.screen.fill("white")
         for fruit in self.fruits:
             fruit.draw(self.screen)
-        floor_rect = self.floor.get_rect()
-        floor_rect.x = 0
-        floor_rect.bottom = self.screen.get_rect().bottom
-        self.screen.blit(self.floor, floor_rect)
+        self.screen.blit(self.floor, self.floor_rect)
+        self.screen.blit(self.line, self.line_rect)
         pygame.display.update()
