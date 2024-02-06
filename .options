@@ -22,3 +22,4 @@ floor_height = 60
 line_img = line.png
 line_size = 2
 top_blank_height = 50
+fruit_size = 0.5

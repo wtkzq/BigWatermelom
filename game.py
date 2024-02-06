@@ -81,7 +81,7 @@ class Game:
                 if event.type == pygame.QUIT:  # 退出
                     exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    self.fruits.append(Fruit(1, self.fruit_imgs.imgs, self.space, pygame.mouse.get_pos()))
+                    self.fruits.append(Fruit(0, self.fruit_imgs.imgs, self.space, pygame.mouse.get_pos()))
 
             self.draw()
             self.space.step(1 / self.settings.fps)
