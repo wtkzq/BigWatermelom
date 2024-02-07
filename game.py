@@ -5,13 +5,15 @@ from sys import exit
 from load_img import ImgLoader
 from fruit import Fruit
 from random import randint
+from consts import *
+import logging
 
 
 class GameSpace(pymunk.Space):
     def init(self):
         super().__init__()
 
-    def create_boundaries(self, screen_width, screen_height, floor_height):
+    def create_boundaries(self, screen_width, screen_height, floor_height, elasticity, friction):
         rects = [
             ((screen_width / 2, screen_height - floor_height / 2), (screen_width, floor_height)),
             ((-10, screen_height / 2), (20, screen_height)),
@@ -22,18 +24,21 @@ class GameSpace(pymunk.Space):
             body = pymunk.Body(body_type=pymunk.Body.STATIC)
             body.position = pos
             shape = pymunk.Poly.create_box(body, size)
-            shape.elasticity = 0.4  # 设置弹性
-            shape.friction = 0.5  # 设置摩擦
+            shape.elasticity = elasticity  # 设置弹性
+            shape.friction = friction  # 设置摩擦
+            shape.collision_type = COLLISION_TYPE_FLOOR
             self.add(body, shape)
 
-    def create_circle(self, radius, mass, pos):
+    def create_circle(self, radius, mass, pos: tuple[float, float], elasticity=0.9, friction=0.5,
+                      collision_type=COLLISION_TYPE_FRUIT) -> pymunk.Shape:
         body = pymunk.Body()
         body.position = pos
         shape = pymunk.Circle(body, radius)
         shape.mass = mass
         shape.color = 255, 0, 0, 100
-        shape.elasticity = 0.9
-        shape.friction = 0.5
+        shape.elasticity = elasticity
+        shape.friction = friction
+        shape.collision_type = collision_type
         self.add(body, shape)
         return shape
 
@@ -52,9 +57,11 @@ class Game:
         # 初始化pymunk空间
         self.space = GameSpace()
         self.space.gravity = 0, 981
-        self.draw_options = pymunk.pygame_util.DrawOptions(self.screen)
+        self.space.add_collision_handler(COLLISION_TYPE_FRUIT, COLLISION_TYPE_FRUIT).post_solve = \
+            self.post_collision_fruit_fruit
         self.space.create_boundaries(
-            self.settings.screen_width, self.settings.screen_height, self.settings.floor_height)
+            self.settings.screen_width, self.settings.screen_height, self.settings.floor_height,
+            self.settings.boundary_elasticity, self.settings.boundary_friction)
 
         # 初始化图像
         self.fruit_imgs = ImgLoader()
@@ -120,3 +127,21 @@ class Game:
         self.fruit_preview = self.fruit_imgs.imgs[self.next_type]
         self.fruit_preview_rect = self.fruit_preview.get_rect()
         self.fruit_preview_rect.centery = self.settings.top_blank_height / 2
+
+    def post_collision_fruit_fruit(self, arbiter: pymunk.Arbiter, space, data):
+        if arbiter.shapes[0].wrapper.type == arbiter.shapes[1].wrapper.type:
+            logging.info(f"两类型为{arbiter.shapes[0].wrapper.type}的水果碰撞。")
+            pos = tuple(
+                (n + m) / 2 for n, m in zip(arbiter.shapes[0].body.position, arbiter.shapes[1].body.position))
+            type = arbiter.shapes[1].wrapper.type + 1
+            try:
+                self.fruits.remove(arbiter.shapes[0].wrapper)
+            except ValueError as e:
+                logging.error(f"{repr(e)}:试图在self.fruits中删除{arbiter.shapes[0].wrapper},但没有")
+            try:
+                self.fruits.remove(arbiter.shapes[1].wrapper)
+            except ValueError as e:
+                logging.error(f"{repr(e)}:试图在self.fruits中删除{arbiter.shapes[0].wrapper},但没有")
+            self.space.remove(arbiter.shapes[0], arbiter.shapes[1])
+            self.fruits.append(Fruit(type, self.fruit_imgs.imgs, self.space, pos))
+            return

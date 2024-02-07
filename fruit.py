@@ -6,20 +6,25 @@ from settings import settings
 
 
 class Fruit:
-    def __init__(self, type, imgs, space, pos):
+    def __init__(self,
+                 type: int,
+                 imgs: list[pygame.Surface | pygame.SurfaceType],
+                 space,
+                 pos: tuple[float, float]
+    ):
         self.type = type
         self.img = imgs[self.type]
         self.position = pos
-        self.body = pymunk.Body()
-        self.body.position = self.position
-        self.shape = pymunk.Circle(self.body, self.img.get_size()[0] / 2)
-        self.shape.mass = 10
-        self.shape.elasticity = settings.fruit_elasticity
-        self.shape.friction = settings.fruit_friction
-        space.add(self.body, self.shape)
+        self.shape: pymunk.Shape = space.create_circle(
+            self.img.get_size()[0] / 2, 10, self.position, settings.fruit_elasticity, settings.fruit_friction)
+        self.shape.wrapper = self
+        self.body = self.shape.body
 
     def draw(self, screen: pygame.Surface):
         img = pt.rotate(self.img, -degrees(self.body.angle))
         rect: pygame.Rect = img.get_rect()
         rect.x, rect.y = (n - m / 2 for n, m in zip(self.body.position, img.get_size()))
         screen.blit(img, rect)
+
+    def __repr__(self):
+        return f"Fruit({self.type}, {self.body.position})"

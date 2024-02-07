@@ -42,7 +42,13 @@ top_blank_height = 70
 fruit_size = 0.5
 
 # 水果弹性
-fruit_elasticity = 0.2
+fruit_elasticity = 0.8
 
 # 水果摩擦
-fruit_friction = 0.4
+fruit_friction = 1
+
+# 边框弹性
+boundary_elasticity = 0.4
+
+# 边框摩擦
+boundary_friction = 0.5
