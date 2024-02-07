@@ -52,3 +52,5 @@ boundary_elasticity = 0.4
 
 # 边框摩擦
 boundary_friction = 0.5
+
+lose_time = 5000

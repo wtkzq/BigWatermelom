@@ -45,6 +45,7 @@ class GameSpace(pymunk.Space):
 
 class Game:
     def __init__(self, settings):
+        self.lose_fruit = None
         self.settings = settings
 
         # 初始化pygame窗口
@@ -87,13 +88,15 @@ class Game:
         self.id = 0
         self.next_type = 0
         self.set_fruit_preview()
+        self.lose_start_time = -1
 
     def main_loop(self):
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:  # 退出
                     exit()
-                if event.type == pygame.MOUSEBUTTONDOWN:
+                elif event.type == pygame.MOUSEBUTTONDOWN or \
+                        (event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE):
                     self.fruits.append(
                         Fruit(self.next_type, self.fruit_imgs.imgs, self.space,
                               (pygame.mouse.get_pos()[0], self.settings.top_blank_height / 2)
@@ -102,6 +105,7 @@ class Game:
                     self.next_type = self.get_next_type()
                     self.set_fruit_preview()
 
+            self.check_lose()
             self.fruit_preview_rect.centerx = pygame.mouse.get_pos()[0]
             self.draw()
             self.space.step(1 / self.settings.fps)
@@ -144,4 +148,22 @@ class Game:
                 logging.error(f"{repr(e)}:试图在self.fruits中删除{arbiter.shapes[0].wrapper},但没有")
             self.space.remove(arbiter.shapes[0], arbiter.shapes[1])
             self.fruits.append(Fruit(type, self.fruit_imgs.imgs, self.space, pos))
-            return
+
+    def check_lose(self):
+        may_lose = False
+        for fruit in self.fruits:
+            if fruit.body.position[1] - fruit.img.get_size()[1] < self.settings.top_blank_height:
+                may_lose = True
+                if self.lose_start_time < 0:
+                    self.lose_start_time = pygame.time.get_ticks()
+                    self.lose_fruit = fruit
+                else:
+                    if self.lose_fruit == fruit:
+                        if pygame.time.get_ticks() - self.lose_start_time > self.settings.lose_time:
+                            self.lose()
+        if not may_lose:
+            self.lose_start_time = -1
+
+    def lose(self):
+        print("lose")
+        exit()
