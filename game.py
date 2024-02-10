@@ -92,21 +92,23 @@ class Game:
         self.set_fruit_preview()
         self.lose_start_time = -1
 
+    def do_events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:  # 退出
+                exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN or \
+                    (event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE):
+                self.fruits.append(
+                    Fruit(self.next_type, self.fruit_imgs.imgs, self.space,
+                          (pygame.mouse.get_pos()[0], self.settings.top_blank_height / 2)
+                          )
+                )
+                self.next_type = self.get_next_type()
+                self.set_fruit_preview()
+
     def main_loop(self):
         while True:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:  # 退出
-                    exit()
-                elif event.type == pygame.MOUSEBUTTONDOWN or \
-                        (event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE):
-                    self.fruits.append(
-                        Fruit(self.next_type, self.fruit_imgs.imgs, self.space,
-                              (pygame.mouse.get_pos()[0], self.settings.top_blank_height / 2)
-                              )
-                    )
-                    self.next_type = self.get_next_type()
-                    self.set_fruit_preview()
-
+            self.do_events()
             self.check_lose()
             self.fruit_preview_rect.centerx = pygame.mouse.get_pos()[0]
             self.draw()
