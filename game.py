@@ -45,12 +45,14 @@ class GameSpace(pymunk.Space):
 
 class Game:
     def __init__(self, settings):
-        self.lose_fruit = None
+        self.is_lost = False
+        self.lose_fruits = {}
         self.settings = settings
 
         # 初始化pygame窗口
         pygame.init()
         self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
+        self.font = pygame.font.SysFont('Arial', 32)
 
         # 初始化计时器
         self.clock = pygame.time.Clock()
@@ -118,6 +120,11 @@ class Game:
         self.screen.blit(self.floor, self.floor_rect)
         self.screen.blit(self.line, self.line_rect)
         self.screen.blit(self.fruit_preview, self.fruit_preview_rect)
+        if self.is_lost:
+            text = self.font.render("GAME_OVER", False, (0, 0, 0))
+            rect = text.get_rect()
+            rect.center = self.screen.get_rect().center
+            self.screen.blit(text, rect)
         pygame.display.update()
 
     def get_next_type(self):
@@ -154,16 +161,19 @@ class Game:
         for fruit in self.fruits:
             if fruit.body.position[1] - fruit.img.get_size()[1] < self.settings.top_blank_height:
                 may_lose = True
-                if self.lose_start_time < 0:
-                    self.lose_start_time = pygame.time.get_ticks()
-                    self.lose_fruit = fruit
+                if fruit in self.lose_fruits:
+                    if pygame.time.get_ticks() - self.lose_fruits[fruit] > self.settings.lose_time:
+                        self.lose()
+                        """if self.lose_start_time < 0:
+                        self.lose_start_time = pygame.time.get_ticks()
+                        self.lose_fruits.append(fruit)"""
                 else:
-                    if self.lose_fruit == fruit:
-                        if pygame.time.get_ticks() - self.lose_start_time > self.settings.lose_time:
-                            self.lose()
+                    self.lose_fruits[fruit] = pygame.time.get_ticks()
+            elif fruit in self.lose_fruits:
+                self.lose_fruits.pop(fruit)
         if not may_lose:
             self.lose_start_time = -1
 
     def lose(self):
         print("lose")
-        exit()
+        self.is_lost = True
